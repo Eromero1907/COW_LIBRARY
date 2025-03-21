@@ -1,5 +1,5 @@
-#ifndef VERSIONEDFILE_H
-#define VERSIONEDFILE_H
+#ifndef COW_LIBRARY_H
+#define COW_LIBRARY_H
 
 #include <iostream>
 #include <fstream>
@@ -47,4 +47,4 @@ private:
     int nextBlockID;
 };
 
-#endif // VERSIONEDFILE_H
+#endif // COW_LIBRARY_H
