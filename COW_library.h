@@ -30,16 +30,16 @@ class VersionedFile {
 public:
     VersionedFile(const std::string& filename);
     
-    void create();
-    void open();
-    void close();
-    void write(const std::string& data);
-    std::string read(int versionNumber);
-    void listVersions();
-    void listDataBlocks();
+    void create(); // Check
+    void open(); // Falta
+    void close(); // Falta
+    void write(const std::string& data); // Check
+    std::string read(int versionNumber); // Check
+    void listVersions(); // Check
+    void listDataBlocks(); // Check
 
 private:
-    int findExistingBlock(const std::vector<char>& blockData);
+    int findExistingBlock(const std::vector<char>& blockData); // Check
 
     std::string filename;
     std::vector<FileVersion> versions;
