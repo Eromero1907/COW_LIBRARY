@@ -30,11 +30,13 @@ public:
     std::string concatenateVersions() const;
     int getVersionCount() const;
 
+    // 🔑 Cambios aquí: Las funciones save() y load() ahora son públicas
+    void save();
+    void load();
+
 private:
     std::string currentTimestamp() const;
     void cleanup();
-    void save();
-    void load();
 
     std::string filename;
     std::vector<FileVersion> versions;
