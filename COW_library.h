@@ -1,50 +1,51 @@
 #ifndef COW_LIBRARY_H
 #define COW_LIBRARY_H
 
+#include <string>
+#include <vector>
+#include <deque>
 #include <iostream>
 #include <fstream>
-#include <vector>
-#include <string>
 #include <filesystem>
 #include <ctime>
 
-const size_t BLOCK_SIZE = 4; // Tamaño del bloque en bytes
+#define BLOCK_SIZE 4096  // Tamaño de cada bloque de datos
+#define MAX_VERSIONS 2 // Número máximo de versiones almacenadas
 
-// Estructura para almacenar metadatos de cada versión
-struct FileVersion {
-    int versionNumber;         // Número de versión
-    std::string filename;      // Nombre del archivo versionado
-    size_t fileSize;           // Tamaño del archivo en bytes
-    std::string timestamp;     // Fecha y hora de creación
-    std::vector<int> blockIDs; // IDs de bloques de datos usados en esta versión
+struct DataBlock {
+    int blockID;
+    std::vector<char> data;
+    int referenceCount;
 };
 
-// Estructura para representar bloques de datos compartidos
-struct DataBlock {
-    int blockID;               // ID único del bloque
-    std::vector<char> data;    // Datos almacenados en este bloque
-    int referenceCount;        // Cuántas versiones están usando este bloque
+struct FileVersion {
+    int versionNumber;
+    std::string filename;
+    size_t fileSize;
+    std::string timestamp;
+    std::vector<int> blockIDs;
 };
 
 class VersionedFile {
-public:
-    VersionedFile(const std::string& filename);
+    private:
+        std::string filename;         // Nombre del archivo base
+        std::string logFilename;      // Nombre del archivo de log donde se guardan las versiones
+        std::deque<long> versionOffsets; // Desplazamientos (offsets) de cada versión en el archivo de log
     
-    void create(); // Check
-    void open(); // Falta
-    void close(); // Falta
-    void write(const std::string& data); // Check
-    std::string read(int versionNumber); // Check
-    void listVersions(); // Check
-    void listDataBlocks(); // Check
-
-private:
-    int findExistingBlock(const std::vector<char>& blockData); // Check
-
-    std::string filename;
-    std::vector<FileVersion> versions;
-    std::vector<DataBlock> dataBlocks;
-    int nextBlockID;
-};
-
-#endif // COW_LIBRARY_H
+        void saveVersion();       // Guarda una nueva versión en el log
+        void garbageCollector();  // Elimina versiones antiguas si se supera el límite
+        void loadVersions();      // Carga los offsets de las versiones existentes en el log
+    
+    public:
+        VersionedFile(const std::string& filename);  // Constructor
+    
+        void create();            // Crea un nuevo archivo y su log de versiones
+        void open();              // Abre el archivo y carga sus versiones
+        void close() {}           // No se necesita manejo especial en esta implementación
+        void write(const std::string& data); // Escribe datos y genera una nueva versión
+        std::string read(int version); // Lee una versión específica del archivo
+        void listVersions();      // Lista todas las versiones disponibles
+        void listDataBlocks();    // Muestra los bloques de datos guardados
+    };
+    
+    #endif // COW_LIBRARY_H
